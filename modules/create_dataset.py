@@ -1,4 +1,4 @@
-from const import wells, carotage_types, custom_dir, raw_log_dir, log_dir, slices_dir, wellheads,\
+from const import wells, carotage_types, raw_log_dir, log_dir, slices_dir, wellheads,\
     raw_cube, sourceX, sourceY, INLINE_3D, CROSSLINE_3D, nsamples, dt, ilines, xlines, \
     max_distance, well_width, slice_coord_path, norm_dict_path
 from utils import projection
@@ -191,14 +191,15 @@ def gen_tgt_mask(slice_coords, vertical_grid, las_df, carotage_types, well_width
     return target, mask
 
 
-def project_wells_onto_slice(slice_num, slice_type, well_list, carotage_types, well_width):
+def project_wells_onto_slice(slice_num, slice_type, well_list, carotage_types, well_width, verbose=False):
     """Finds projections of wells onto a given seismic slice"""
     slice_coords = slice_coord_dict[slice_type][slice_num]
     vertical_grid = np.arange(nsamples) * dt
     target, mask = None, None
 
     for well_name in well_list:
-        print(' ', well_name)
+        if verbose:
+            print(' ', well_name)
         # las_df = read_las(well_name, carotage_types)
         # dev_df, kb = read_dev(well_name)
         # layer_0_corr = get_layer0_correction(well_name)
@@ -323,7 +324,6 @@ def process_all_cube(well_list, slice_list, max_distance, carotage_types, well_w
     for slice_type, slice_num in slice_list:
         print(f'{slice_type} {slice_num}')
         slice_data = get_slice_data(slice_num, slice_type, well_list, max_distance, carotage_types, well_width)
-        print()
         if slice_data:
             with open(slice_dir / f'{slice_type}_{slice_num}.pkl', 'wb') as f:
                 pickle.dump(slice_data, f)
@@ -335,7 +335,6 @@ def process_single_wells(slice_well_list, carotage_types, well_width, slice_dir)
     for slice_type, slice_num, well_name in slice_well_list:
         print(f'{slice_type} {slice_num}, {well_name}')
         slice_data = get_slice_data_single_well(slice_num, slice_type, well_name, carotage_types, well_width)
-        print()
         if slice_data:
             with open(slice_dir / f'{slice_type}_{slice_num}_{well_name}.pkl', 'wb') as f:
                 pickle.dump(slice_data, f)
@@ -353,7 +352,7 @@ def create_slice_well_list(wells, slice_range=10):
 
 
 if __name__ == '__main__':
-    # generate_logs(wells, log_dir)
+    generate_logs(wells, log_dir)
 
     slice_well_list = create_slice_well_list(wells)
     process_single_wells(slice_well_list, carotage_types, well_width, slices_dir)

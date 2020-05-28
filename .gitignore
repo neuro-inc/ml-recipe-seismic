@@ -1,5 +1,9 @@
 # Neuro Template:
-/data/**/*
+# /data/**/*
+/data/processed_las/*
+/data/slices/*
+/data/Seismic_data.sgy
+/models/*
 /config/*.txt
 /config/*.conf
 /config/*.json
