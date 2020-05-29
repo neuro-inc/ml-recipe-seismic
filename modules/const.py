@@ -23,7 +23,7 @@ model_log_dir = project_path / 'train_log'
 model_log_dir.mkdir(exist_ok=True)
 dumps_dir = project_path / 'dumps'
 dumps_dir.mkdir(exist_ok=True)
-model_dir = project_path / 'models'
+model_dir = project_path / 'models/smoothed'
 model_dir.mkdir(exist_ok=True)
 
 # типы каротажей
