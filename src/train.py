@@ -1,15 +1,21 @@
-from model1 import uResNet34
-from model_utils import get_scheduler
-from data_gen1 import SliceIterator, primary_transform
-from const import (
-    model_log_dir, dumps_dir, model_dir,
-    slices_dir, wells, crossval_dict, norm_dict_path
+#
+# Main training script
+#
+from src.model1 import uResNet34
+from src.model_utils import get_scheduler
+from src.gen1 import SliceIterator, primary_transform
+from src.const import (
+    model_log_dir, dumps_dir, model_dir, model_input_size,
+    slices_dir, crossval_dict, norm_dict_path
 )
 import numpy as np
 import re
 import pickle
 from keras.callbacks import ModelCheckpoint, LearningRateScheduler, CSVLogger
 from keras import backend as K
+
+from pathlib import Path
+from typing import List
 
 
 def get_train_test_split(slices_dir, crossval_dict):
@@ -18,48 +24,47 @@ def get_train_test_split(slices_dir, crossval_dict):
     for d in crossval_dict:
         cv_dataset.append(
             {
-                'train':  [f for f in all_slices if re.match('.+_.+_(.+)', f.stem)[1] in d['train']],
-                'test':  [f for f in all_slices if re.match('.+_.+_(.+)', f.stem)[1] in d['test']]
+                'train': [f for f in all_slices if re.match('.+_.+_(.+)', f.stem)[1] in d['train']],
+                'test': [f for f in all_slices if re.match('.+_.+_(.+)', f.stem)[1] in d['test']]
             }
         )
     return cv_dataset
 
-# Definitions of global constants and train/test splits.
+
+# Train/test split
 cv_dataset = get_train_test_split(slices_dir, crossval_dict)
 
-
-# Model class shows the decoder type of our hourglass-shaped architecture.
 model_class = uResNet34
-image_size = (480, 512)
 
 # Training parameters: learning rate scheduler, logger, number of epochs for training, and batch size.
 lr_steps = {0: 1e-4, 100: 5e-5}
 scheduler = get_scheduler(lr_steps)
-csv_logger = CSVLogger(model_log_dir / r'training-sz{}x{}.log'.format(*image_size), append=True)
+csv_logger = CSVLogger(model_log_dir / r'training-sz{}x{}.log'.format(*model_input_size), append=True)
 
 nb_epoch = 50
 batch_size = 1
 
-# Reading normalization parameters for different carotage types.
+# Reading normalization parameters for different carotage types
 with open(norm_dict_path, 'rb') as f:
     norm_dict = pickle.load(f)
 
 
-def train(c_types, model_weights, norm, train_slices, test_slices, suff):
+def train(c_types: List, model_weights: Path, norm: List, train_slices: List[Path],
+          test_slices: List[Path], suff: str) -> None:
     """Main function for training the model"""
     K.clear_session()
     model_checkpoint = dumps_dir / r'{}.{}.sz{}x{}.{}.{{epoch:02d}}-{{val_masked_correlation:.2f}}.hdf5'. \
-        format(model_class.__name__, '-'.join(c_types), *image_size, suff)
+        format(model_class.__name__, '-'.join(c_types), *model_input_size, suff)
     model_checkpoint = str(model_checkpoint)
 
-    train_gen = SliceIterator(train_slices, c_types, image_size, transform_fun=primary_transform, norm=norm, aug=True,
+    train_gen = SliceIterator(train_slices, c_types, model_input_size, transform_fun=primary_transform, norm=norm, aug=True,
                               batch_size=batch_size, shuffle=True, verbose=False, output_ids=False, blur=False)
-    test_gen = SliceIterator(test_slices, c_types, image_size, transform_fun=primary_transform, norm=norm, aug=False,
+    test_gen = SliceIterator(test_slices, c_types, model_input_size, transform_fun=primary_transform, norm=norm, aug=False,
                              batch_size=batch_size, shuffle=False, verbose=False, output_ids=False)
     callbacks = [ModelCheckpoint(model_checkpoint, monitor='val_masked_correlation', mode='max', save_best_only=True),
                  LearningRateScheduler(scheduler),
                  csv_logger]
-    model = model_class(input_size=image_size, weights=model_weights, n_carotage=len(c_types))
+    model = model_class(input_size=model_input_size, weights=model_weights, n_carotage=len(c_types))
     model.fit_generator(
         train_gen,
         steps_per_epoch=int(np.ceil(len(train_slices) / batch_size)),
@@ -73,7 +78,7 @@ def train(c_types, model_weights, norm, train_slices, test_slices, suff):
 
 if __name__ == '__main__':
 
-    # перечень каротажей и инициирующих весов для тренировки; None - с нуля
+    # carotage list and initial weights for training; None - training from scratch
     pretrain = {
         'Gamma_Ray': None,
         'Porosity': None,
@@ -82,16 +87,16 @@ if __name__ == '__main__':
     }
 
     nfolds = len(cv_dataset)
-    for fold in range(nfolds):  # номер фолда
+    for fold in range(nfolds):  # fold number
         print(f'fold {fold + 1} of {nfolds}')
         train_slices = cv_dataset[fold]['train']
         test_slices = cv_dataset[fold]['test']
         suff = f'smtd_{fold}'
 
-        # For each carotage type, read model weights and train the model
+        # train individual model for each carotage type
         for k, v in pretrain.items():
-            print(f'Carotage {k}, {v}')
-            c_types = [k]
+            print(f'Carotage {k}, weights {v}')
+            c_types = [k]   # carotage type
             norm = [(norm_dict[c]['mean'], norm_dict[c]['std']) for c in ['seismic'] + c_types]
             model_weights = model_dir / v if v else None
             train(c_types, model_weights, norm, train_slices, test_slices, suff)

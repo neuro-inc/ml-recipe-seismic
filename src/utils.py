@@ -1,7 +1,6 @@
-from data_types import Point
+from src.data_types import Point
 
 
-# проецируем точку p на линию [p1, p2]
 def projection(p1, p2, p):
     """Find the projection of a point p on the line [p1, p2]"""
     A = (p1.y - p2.y) / (p1.x - p2.x)

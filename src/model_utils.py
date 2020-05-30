@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 def get_scheduler(lr_steps: dict):
     def scheduler(epoch):
         for step in sorted(lr_steps)[::-1]:

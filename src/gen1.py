@@ -1,18 +1,25 @@
-from const import carotage_types, norm_dict_path
+#
+# Data generator for uResNet34 2D-segmentation model
+#
+
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+from src.const import carotage_types, norm_dict_path, slices_dir, nsamples, dt, model_input_size
 import numpy as np
 import cv2
 import pickle
 import threading
 import matplotlib.pyplot as plt
 from itertools import islice, chain
-import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
+
 from keras import backend as K
 from pathlib import Path
 
 
 def null_transform(*args, **kwargs):
     return args
+
 
 def primary_transform(x, m, y, size, norm, aug, blur):
     if norm:
@@ -37,7 +44,7 @@ def primary_transform(x, m, y, size, norm, aug, blur):
 
 
 class SliceIterator(object):
-    '''This class iterates over seismic slices for training or inference.'''
+    """This class iterates over seismic slices for training or inference"""
 
     def __init__(self, slice_list, carotage_types, image_size, transform_fun=null_transform, norm=None,
                  aug=False, batch_size=8, shuffle=True, seed=None, verbose=False, infinite_loop=True,
@@ -130,7 +137,7 @@ class SliceIterator(object):
 
 
 def dump_normalization_values(silces_dir, path=norm_dict_path, overwrite=False):
-    '''Compute and save to disk normalization values.'''
+    """Compute and save to disk normalization values"""
     if path.exists() and not overwrite:
         return
     image_size = (1024, 810)
@@ -154,14 +161,13 @@ def dump_normalization_values(silces_dir, path=norm_dict_path, overwrite=False):
 
 if __name__ == '__main__':
 
-    c_types = ['GK', 'SP', 'NKTD']
+    c_types = ['Gamma_Ray']
     with open(norm_dict_path, 'rb') as f:
         norm_dict = pickle.load(f)
     norm = [(norm_dict[c]['mean'], norm_dict[c]['std']) for c in ['seismic'] + c_types]
-    image_size = (1024, 512)
-    slice_list = single_test_slices
-    gen = SliceIterator(slice_list, c_types, image_size, transform_fun=primary_transform, norm=norm, aug=True, blur=True,
-                        batch_size=8, shuffle=True, seed=None, verbose=False, output_ids=True, gen_id='')
+    slice_list = slices_dir.glob('*pkl')
+    gen = SliceIterator(slice_list, c_types, model_input_size, transform_fun=primary_transform, norm=norm, aug=True,
+                        blur=True, batch_size=8, shuffle=True, seed=None, verbose=False, output_ids=True, gen_id='')
 
     x_m, y, ids = zip(*islice(gen, 2))
     x, m = zip(*x_m)
@@ -173,11 +179,12 @@ if __name__ == '__main__':
     c = 0
     c_type = c_types[c]
     for mask, target, id in zip(m, y, ids):
+        extent = [0, mask.shape[1] - 1, nsamples * dt, 0]
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(5, 10), sharey=True)
-        ax1.imshow(mask[..., c], cmap='Greys_r', extent=[0, mask.shape[1] - 1, 1024 * 2 - 1, 0])
+        ax1.imshow(mask[..., c], cmap='Greys_r', extent=extent)
         ax1.set_title('Mask')
-        ax1.set_ylabel('ms', fontsize='10')
-        ax2.imshow(target[..., c], cmap='Spectral_r', extent=[0, mask.shape[1] - 1, 1024 * 2 - 1, 0])
-        ax2.set_title(f'{id}, {c_type} carotage')
+        ax1.set_ylabel('ms', fontsize=10)
+        ax2.imshow(target[..., c], cmap='Spectral_r', extent=extent)
+        ax2.set_title(f'{id}, {c_type}')
         plt.tight_layout()
         plt.show()
