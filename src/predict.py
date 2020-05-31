@@ -106,7 +106,7 @@ def process_all_folds(weights: dict, carotage: str) -> dict:
     return all_viz
 
 
-def average_prediction(eval_dict) -> dict:
+def average_prediction(eval_dict: dict) -> dict:
     """average predictions for every well across slices of the same type (i.e. ilines/xlines)
     return: dict[well][slice_type]: {'t', 'true_average', 'pred_average', 'corr'}
     """
@@ -114,20 +114,16 @@ def average_prediction(eval_dict) -> dict:
     mean_eval_dict = {}
     for w in wells:
         mean_eval_dict[w] = {}
-        for slice_type in ['iline', 'xline']:
-            t = next(v['t'] for k, v in eval_dict.items() if (w in k) and (slice_type in k))
-            true_carotage = next(v['true_carotage'] for k, v in eval_dict.items()
-                                 if (w in k) and (slice_type in k))
-            pred_carotage = [v['pred_carotage'] for k, v in eval_dict.items() if
-                             (w in k) and (slice_type in k)]
-            pred_carotage = np.stack(pred_carotage).mean(0)
-            corr = np.corrcoef(true_carotage[~np.isnan(true_carotage)], pred_carotage[~np.isnan(pred_carotage)])[0, 1]
-            print(f'well {w}, {slice_type}, corr={corr:0.2f}')
-            mean_eval_dict[w][slice_type] = {}
-            mean_eval_dict[w][slice_type]['t'] = t
-            mean_eval_dict[w][slice_type]['true_carotage'] = true_carotage
-            mean_eval_dict[w][slice_type]['pred_carotage'] = pred_carotage
-            mean_eval_dict[w][slice_type]['corr'] = corr
+        t = next(v['t'] for k, v in eval_dict.items() if w in k)
+        true_carotage = next(v['true_carotage'] for k, v in eval_dict.items() if w in k)
+        pred_carotage = [v['pred_carotage'] for k, v in eval_dict.items() if w in k]
+        pred_carotage = np.stack(pred_carotage).mean(0)
+        corr = np.corrcoef(true_carotage[~np.isnan(true_carotage)], pred_carotage[~np.isnan(pred_carotage)])[0, 1]
+        print(f'well {w}, corr={corr:0.2f}')
+        mean_eval_dict[w]['t'] = t
+        mean_eval_dict[w]['true_carotage'] = true_carotage
+        mean_eval_dict[w]['pred_carotage'] = pred_carotage
+        mean_eval_dict[w]['corr'] = corr
     return mean_eval_dict
 
 
