@@ -2,8 +2,9 @@
 
 In this ML recipe, we demonstrate a simplified version of Seismic interpretation project, a recent development of Neuromation in the field of commercial oil exploration.   
 
-#####Introduction
-#####Data
+##### Introduction
+
+##### Data
 For demonstration purposes, we use open data from the Netherlands Offshore F3 Block, [link](https://terranubis.com/datainfo/Netherlands-Offshore-F3-Block-Complete). F3 is a block in the Dutch sector of the North Sea. The block is covered by 3D seismic that was acquired to explore for oil and gas in the Upper-Jurassic - Lower-Cretaceous strata.  The characteristics of the 3D seismic survey are the following: 
 - inline range: 100 through 750 lines
 - crossline range: 300 through 1250 lines
@@ -13,7 +14,7 @@ For demonstration purposes, we use open data from the Netherlands Offshore F3 Bl
 
 Within the survey, only four vertical wells are present. All wells have sonic and gamma ray logs. In this demo, we implement 4-fold crossvalidation training our model on 3 wells and validating on the remaining well.
 
-#####Method
+##### Method
 The model is 2D-2D hourglass transcoder network trained to convert a 2D seismic slice into 2D carotage picture:
 
 ![](./img/network.png)
@@ -22,7 +23,7 @@ As input, we use multiple inlines/crosslines in the neighbourhood of the 4 wells
  
 ![](./img/data.png)
 
-#####Results
+##### Results
 ## Quick Start
 
 Sign up at [neu.ro](https://neu.ro) and setup your local machine according to [instructions](https://neu.ro/docs).
