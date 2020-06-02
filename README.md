@@ -16,11 +16,11 @@ Within the survey, only four vertical wells are present. All wells have sonic an
 ![](./img/scene.png)
 
 ### Method
-The model is 2D-2D transcoder network trained to convert a 2D seismic image into 2D:
+The model is a 2D-2D transcoder network trained to convert a 2D seismic image into 2D petrophysical image:
 
 ![](./img/network.png)
 
-As input, we use vertical 2D seismic slices in the neighbourhood of the 4 wells cut along inline/crossline axes. We crop 21 x 2 nearest slices along both horizontal dimensions. Training targets are being constructed as vertical projection of petrophysical data onto corresponding seismic plane. We transform 1D logs into 2D image adding second dimension and expanding it to 20-30 traces. Obviously, these targets cover only small region of a seismic slice, and training is implemented with 2D masked Mean Squared Error (MSE) loss.
+As input, we use vertical 2D seismic slices in the neighbourhood of the 4 wells. We crop 21 x 2 nearest slices along two horizontal inline/crossline axes. Training targets are being constructed as vertical projection of petrophysical data onto corresponding seismic plane. We transform 1D logs into 2D image adding second dimension and expanding it to 20-30 traces. Obviously, these targets cover only small region of a seismic slice, and training is implemented with 2D masked Mean Squared Error (MSE) loss.
  
 ![](./img/data.png)
 
