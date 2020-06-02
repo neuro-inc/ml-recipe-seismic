@@ -16,17 +16,17 @@ Within the survey, only four vertical wells are present. All wells have sonic an
 ![](./img/scene.png)
 
 ### Method
-The model is 2D-2D transcoder network trained to convert a 2D seismic slice into 2D petrophysical image:
+The model is 2D-2D transcoder network trained to convert a 2D seismic image into 2D:
 
 ![](./img/network.png)
 
-As input, we use multiple inlines/crosslines in the neighbourhood of the 4 wells. We use 21 nearest slices along each horizontal dimension. Training targets are being constructed as vertical projection of petrophysical data onto corresponding seismic slices. We transform 1D logs into 2D image by adding second dimension and expanding it to 20-30 traces. Obviously, these targets cover only small region of a seismic slice, and training is implemented with 2D masked Mean Squared Error (MSE) loss.
+As input, we use vertical 2D seismic slices in the neighbourhood of the 4 wells cut along inline/crossline axes. We crop 21 x 2 nearest slices along both horizontal dimensions. Training targets are being constructed as vertical projection of petrophysical data onto corresponding seismic plane. We transform 1D logs into 2D image adding second dimension and expanding it to 20-30 traces. Obviously, these targets cover only small region of a seismic slice, and training is implemented with 2D masked Mean Squared Error (MSE) loss.
  
 ![](./img/data.png)
 
 ### Results
 
-We crossvalidate Gamma log model on the dataset of 168 projections (4 wells x 2 horizontal directions x 21 slice in each direction). We minimize masked MSE loss for 150 epochs. The model typically converges after 50 epochs. The Pearson correlation between true and predicted well logs is remarkably high, especially taking into account the limited size of the training data:
+We crossvalidate Gamma log model on the dataset of 168 projections (4 wells x 2 horizontal dimensions x 21 slice in each direction). We minimize masked MSE loss for 150 epochs. The model typically converges after 50 epochs. The Pearson correlation between true and predicted well logs is remarkably high, especially taking into account the limited size of the training data:
 
 |well|correlation|
 |:---:|:---:|
