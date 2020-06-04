@@ -42,7 +42,7 @@ Needless to say that 4 item dataset isn't enough to draw serious conclusions fro
 
 ## Quick Start
 
-##### 0. Sign up at [neu.ro](https://neu.ro) and 
+##### 0. Sign up at [neu.ro](https://neu.ro) 
 ##### 1. Setup your local machine according to [instructions](https://neu.ro/docs) and log in
 ```shell
 pip install -U neuromation
