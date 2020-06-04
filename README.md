@@ -42,9 +42,20 @@ Needless to say that 4 item dataset isn't enough to draw serious conclusions fro
 
 ## Quick Start
 
-Sign up at [neu.ro](https://neu.ro) and setup your local machine according to [instructions](https://neu.ro/docs).
- 
-Then run:
+##### 0. Sign up at [neu.ro](https://neu.ro) and 
+##### 1. Setup your local machine according to [instructions](https://neu.ro/docs) and log in
+```shell
+pip install -U neuromation
+neuro login
+```
+##### 2. Run the recipe
+```shell
+git clone git@github.com:neuromation/ml-recipe-seismic.git
+cd ml-recipe-seismic
+make setup
+make jupyter
+```
+##### 3. Run notebooks:
 
 ```shell
 neuro login

@@ -6,7 +6,7 @@ PROJECT_ID=neuro-project-c5ac4e0e
 
 DATA_DIR=data
 CONFIG_DIR=config
-CODE_DIR=modules
+CODE_DIR=src
 NOTEBOOKS_DIR=notebooks
 RESULTS_DIR=results
 

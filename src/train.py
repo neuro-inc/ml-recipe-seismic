@@ -81,9 +81,6 @@ if __name__ == '__main__':
     # carotage list and initial weights for training; None - training from scratch
     pretrain = {
         'Gamma_Ray': None,
-        'Porosity': None,
-        'Density': None,
-        'P_Impedance': None,
     }
 
     nfolds = len(cv_dataset)
