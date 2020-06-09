@@ -11,7 +11,7 @@ NOTEBOOKS_DIR=notebooks
 RESULTS_DIR=results
 
 PROJECT_PATH_STORAGE=storage:ml-recipe-seismic
-PROJECT_PATH_ENV=/project
+PROJECT_PATH_ENV=/ml-recipe-seismic
 
 PROJECT=ml-recipe-seismic
 SETUP_JOB=setup-$(PROJECT)
