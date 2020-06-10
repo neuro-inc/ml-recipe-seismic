@@ -394,6 +394,7 @@ train: _check_setup $(SYNC)   ### Run a training job (set up env var 'RUN' to sp
 		$(CUSTOM_ENV) \
 		bash -c 'cd $(PROJECT_PATH_ENV) && \
 		    sh download_data.sh && \
+		    python -u $(CODE_DIR)/create_dataset.py \
 		    python -u $(CODE_DIR)/train.py'
 ifeq ($(TRAIN_STREAM_LOGS), yes)
 	@echo "Streaming logs of the job $(TRAIN_JOB)-$(RUN)"
