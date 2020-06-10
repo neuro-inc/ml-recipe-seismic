@@ -395,7 +395,6 @@ train: _check_setup $(SYNC)   ### Run a training job (set up env var 'RUN' to sp
 		bash -c 'cd $(PROJECT_PATH_ENV) && \
 		    sh download_data.sh && \
 		    python -u $(CODE_DIR)/train.py'
-		bash -c 'cd /$(PROJECT_PATH_ENV) && $(TRAIN_CMD)'
 ifeq ($(TRAIN_STREAM_LOGS), yes)
 	@echo "Streaming logs of the job $(TRAIN_JOB)-$(RUN)"
 	$(NEURO) exec --no-key-check -T $(TRAIN_JOB)-$(RUN) "tail -f /output" || echo -e "Stopped streaming logs.\nUse 'neuro logs <job>' to see full logs."
