@@ -12,7 +12,7 @@ RESULTS_DIR=results
 
 PROJECT_PATH_STORAGE=storage:ml-recipe-seismic
 PROJECT_PATH_ENV=/ml-recipe-seismic
-DATA_ROOT_PATH_ENV=/data
+DATA_ROOT_PATH_ENV=/storage_path
 
 PROJECT=ml-recipe-seismic
 SETUP_JOB=setup-$(PROJECT)
@@ -386,6 +386,7 @@ train: _check_setup $(SYNC)   ### Run a training job (set up env var 'RUN' to sp
 		--volume $(DATA_DIR_STORAGE):/$(PROJECT_PATH_ENV)/$(DATA_DIR):rw \
 		--volume $(PROJECT_PATH_STORAGE):/$(PROJECT_PATH_ENV):rw \
 		--env PYTHONPATH=/$(PROJECT_PATH_ENV) \
+		--env DATA_PATH=$(DATA_ROOT_PATH_ENV) \
 		--env EXPOSE_SSH=yes \
 		--life-span=0 \
 		$(OPTION_GCP_CREDENTIALS) $(OPTION_AWS_CREDENTIALS) $(OPTION_WANDB_CREDENTIALS) \
@@ -480,6 +481,7 @@ jupyter: _check_setup $(SYNC) ### Run a job with Jupyter Notebook and open UI in
 		--volume $(PROJECT_PATH_STORAGE):/$(PROJECT_PATH_ENV):rw \
 		--life-span=1d \
 		--env PYTHONPATH=/$(PROJECT_PATH_ENV) \
+		--env DATA_PATH=$(DATA_ROOT_PATH_ENV) \
 		$(OPTION_GCP_CREDENTIALS) $(OPTION_AWS_CREDENTIALS) $(OPTION_WANDB_CREDENTIALS) \
 		$(CUSTOM_ENV) \
 		jupyter $(JUPYTER_MODE) \

@@ -59,6 +59,8 @@ def create_slice_coord_dict(path: Path or str) -> None:
 
 def get_slice_coord_dict():
     """Load dictionary with slice coordinates"""
+    if not slice_coord_path.exists():
+        create_slice_coord_dict(slice_coord_path)
     with open(slice_coord_path, 'rb') as f:
         slice_coord_dict = pickle.load(f)
     return slice_coord_dict

@@ -16,7 +16,7 @@ from keras.models import Model
 from keras.optimizers import Adam
 
 from classification_models.resnet import ResNet34
-import runai.ga  # gradient accumulation
+import runai.ga.keras  # gradient accumulation
 
 from typing import Tuple, List
 from pathlib import Path

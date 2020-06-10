@@ -1,7 +1,7 @@
 neuromation>=20.4.6
 runai
 segyio
-image-classifiers>=0.2.2
+image-classifiers==0.2.2
 Keras>=2.2.0
 TensorFlow-gpu>=1.14.0
 opencv-python>=4.1.0
