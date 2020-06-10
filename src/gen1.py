@@ -136,12 +136,13 @@ class SliceIterator(object):
         return self.next(*args, **kwargs)
 
 
-def dump_normalization_values(silces_dir, path=norm_dict_path, overwrite=False):
+def dump_normalization_values(slices_dir, path=norm_dict_path, overwrite=False):
     """Compute and save to disk normalization values"""
     if path.exists() and not overwrite:
         return
-    image_size = (1024, 810)
-    slice_list = list(Path(silces_dir).glob('*.pkl'))
+    # image_size = (1024, 810)
+    image_size = model_input_size
+    slice_list = list(Path(slices_dir).glob('*.pkl'))
     gen = SliceIterator(slice_list, carotage_types, image_size, transform_fun=primary_transform,
                         norm=None, batch_size=16, shuffle=False, infinite_loop=False)
     norm_dict = {c: {'mean': [], 'std': []} for c in ['seismic'] + carotage_types}

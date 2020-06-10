@@ -3,7 +3,7 @@
 #
 from src.model1 import uResNet34
 from src.model_utils import get_scheduler
-from src.gen1 import SliceIterator, primary_transform
+from src.gen1 import SliceIterator, primary_transform, dump_normalization_values
 from src.const import (
     model_log_dir, dumps_dir, model_dir, model_input_size,
     slices_dir, crossval_dict, norm_dict_path
@@ -44,9 +44,17 @@ csv_logger = CSVLogger(model_log_dir / r'training-sz{}x{}.log'.format(*model_inp
 nb_epoch = 50
 batch_size = 1
 
-# Reading normalization parameters for different carotage types
-with open(norm_dict_path, 'rb') as f:
-    norm_dict = pickle.load(f)
+
+def get_norm_dict():
+    """Reading normalization parameters for different carotage types"""
+    if not norm_dict_path.exists():
+        dump_normalization_values(slices_dir, path=norm_dict_path, overwrite=False)
+    with open(norm_dict_path, 'rb') as f:
+        norm_dict = pickle.load(f)
+    return norm_dict
+
+
+norm_dict = get_norm_dict()
 
 
 def train(c_types: List, model_weights: Path, norm: List, train_slices: List[Path],
