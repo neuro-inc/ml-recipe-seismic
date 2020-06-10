@@ -22,7 +22,7 @@ slices_dir = data_dir / 'slices/smoothed'
 slices_dir.mkdir(exist_ok=True, parents=True)
 
 # model paths
-model_log_dir = project_path / 'results'
+model_log_dir = project_path / 'train_log'
 model_log_dir.mkdir(exist_ok=True)
 dumps_dir = project_path / 'dumps'
 dumps_dir.mkdir(exist_ok=True)
