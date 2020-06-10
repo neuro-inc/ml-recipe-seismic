@@ -12,6 +12,7 @@ RESULTS_DIR=results
 
 PROJECT_PATH_STORAGE=storage:ml-recipe-seismic
 PROJECT_PATH_ENV=/ml-recipe-seismic
+DATA_ROOT_PATH_ENV=/data
 
 PROJECT=ml-recipe-seismic
 SETUP_JOB=setup-$(PROJECT)
