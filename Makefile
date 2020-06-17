@@ -166,7 +166,6 @@ setup: ### Setup remote environment
 	$(NEURO) cp requirements.txt $(PROJECT_PATH_STORAGE)
 	$(NEURO) cp apt.txt $(PROJECT_PATH_STORAGE)
 	$(NEURO) cp setup.cfg $(PROJECT_PATH_STORAGE)
-	$(NEURO) cp download_data.sh $(PROJECT_PATH_STORAGE)
 	$(NEURO) run $(RUN_EXTRA) \
 		--name $(SETUP_JOB) \
 		--tag "target:setup" $(_PROJECT_TAGS) \
@@ -393,7 +392,7 @@ train: _check_setup $(SYNC)   ### Run a training job (set up env var 'RUN' to sp
 		$(OPTION_GCP_CREDENTIALS) $(OPTION_AWS_CREDENTIALS) $(OPTION_WANDB_CREDENTIALS) \
 		$(CUSTOM_ENV) \
 		bash -c 'cd $(PROJECT_PATH_ENV) && \
-		    sh download_data.sh && \
+		    sh $(CODE_DIR)/download_data.sh && \
 		    python -u $(CODE_DIR)/create_dataset.py \
 		    python -u $(CODE_DIR)/train.py'
 ifeq ($(TRAIN_STREAM_LOGS), yes)
