@@ -368,9 +368,13 @@ def process_single_wells(slice_well_list: List, carotage_types: List, well_width
                 pickle.dump(slice_data, f)
 
 
-if __name__ == '__main__':
+def preprocess():
+    print('*** Run data preprocessing ***\n')
     generate_logs(wells, log_dir)
-
     slice_well_list = create_slice_well_list(wells)
     process_single_wells(slice_well_list, carotage_types, well_width, slices_dir)
     dump_normalization_values(slices_dir, path=norm_dict_path, overwrite=True)
+
+
+if __name__ == '__main__':
+    preprocess()

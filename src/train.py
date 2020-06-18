@@ -8,6 +8,7 @@ from src.const import (
     model_log_dir, dumps_dir, model_dir, model_input_size,
     slices_dir, crossval_dict, norm_dict_path
 )
+from src.create_dataset import preprocess
 import numpy as np
 import re
 import pickle
@@ -16,6 +17,18 @@ from keras import backend as K
 
 from pathlib import Path
 from typing import List
+
+
+def get_norm_dict():
+    """Reading normalization parameters for different carotage types"""
+    if not norm_dict_path.exists():
+        preprocess()
+        # dump_normalization_values(slices_dir, path=norm_dict_path, overwrite=False)
+    with open(norm_dict_path, 'rb') as f:
+        norm_dict = pickle.load(f)
+    return norm_dict
+
+norm_dict = get_norm_dict()
 
 
 def get_train_test_split(slices_dir, crossval_dict):
@@ -31,9 +44,6 @@ def get_train_test_split(slices_dir, crossval_dict):
     return cv_dataset
 
 
-# Train/test split
-cv_dataset = get_train_test_split(slices_dir, crossval_dict)
-
 model_class = uResNet34
 
 # Training parameters: learning rate scheduler, logger, number of epochs for training, and batch size.
@@ -44,17 +54,8 @@ csv_logger = CSVLogger(model_log_dir / r'training-sz{}x{}.log'.format(*model_inp
 nb_epoch = 50
 batch_size = 1
 
-
-def get_norm_dict():
-    """Reading normalization parameters for different carotage types"""
-    if not norm_dict_path.exists():
-        dump_normalization_values(slices_dir, path=norm_dict_path, overwrite=False)
-    with open(norm_dict_path, 'rb') as f:
-        norm_dict = pickle.load(f)
-    return norm_dict
-
-
-norm_dict = get_norm_dict()
+# Train/test split
+cv_dataset = get_train_test_split(slices_dir, crossval_dict)
 
 
 def train(c_types: List, model_weights: Path, norm: List, train_slices: List[Path],
