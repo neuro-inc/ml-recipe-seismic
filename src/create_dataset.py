@@ -371,8 +371,12 @@ def process_single_wells(slice_well_list: List, carotage_types: List, well_width
 def preprocess():
     print('*** Run data preprocessing ***\n')
     generate_logs(wells, log_dir)
+
+    print('Generate well/slice projections\n')
     slice_well_list = create_slice_well_list(wells)
     process_single_wells(slice_well_list, carotage_types, well_width, slices_dir)
+
+    print('Create normalization dictionary')
     dump_normalization_values(slices_dir, path=norm_dict_path, overwrite=True)
 
 
