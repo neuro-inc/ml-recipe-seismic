@@ -63,7 +63,6 @@ neuro login
 ```
 ##### 2. Run the recipe
 ```shell
-`git clone git@github.com:neuromation/ml-recipe-seismic.git
 git clone https://github.com/neuromation/ml-recipe-seismic.git
 cd ml-recipe-seismic
 make setup
