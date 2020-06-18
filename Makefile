@@ -6,7 +6,6 @@ PROJECT_ID=neuro-project-c5ac4e0e
 
 DATA_DIR=data
 CONFIG_DIR=config
-CODE_DIR=src
 NOTEBOOKS_DIR=notebooks
 RESULTS_DIR=results
 
@@ -68,7 +67,7 @@ TRAIN_STREAM_LOGS?=yes
 
 # Command to run training inside the environment:
 #   make train TRAIN_CMD="python ./train.py"
-TRAIN_CMD?=python -u $(CODE_DIR)/train.py --data $(DATA_DIR)
+TRAIN_CMD?=python -u src/train.py --data $(DATA_DIR)
 
 # Postfix of training jobs:
 #   make train RUN=experiment-2
@@ -116,7 +115,7 @@ AWS_SECRET_PATH_LOCAL=$(CONFIG_DIR)/$(AWS_SECRET_FILE)
 AWS_SECRET_PATH_ENV=/$(PROJECT_PATH_ENV)/$(AWS_SECRET_PATH_LOCAL)
 WANDB_SECRET_PATH_LOCAL=$(CONFIG_DIR)/$(WANDB_SECRET_FILE)
 WANDB_SECRET_PATH_ENV=/$(PROJECT_PATH_ENV)/$(WANDB_SECRET_PATH_LOCAL)
-WANDB_SWEEP_CONFIG_PATH=$(CODE_DIR)/$(WANDB_SWEEP_CONFIG_FILE)
+WANDB_SWEEP_CONFIG_PATH=src/$(WANDB_SWEEP_CONFIG_FILE)
 WANDB_SWEEPS_FILE=.wandb_sweeps
 
 
@@ -158,7 +157,7 @@ help:
 .PHONY: setup
 setup: ### Setup remote environment
 	$(NEURO) mkdir --parents $(PROJECT_PATH_STORAGE) \
-		$(PROJECT_PATH_STORAGE)/$(CODE_DIR) \
+		$(PROJECT_PATH_STORAGE)/src \
 		$(DATA_DIR_STORAGE) \
 		$(PROJECT_PATH_STORAGE)/$(CONFIG_DIR) \
 		$(PROJECT_PATH_STORAGE)/$(NOTEBOOKS_DIR) \
@@ -198,7 +197,7 @@ upload-code: _check_setup  ### Upload code directory to the platform storage
 		--recursive \
 		--update \
 		--no-target-directory \
-		$(CODE_DIR) $(PROJECT_PATH_STORAGE)/$(CODE_DIR)
+		src $(PROJECT_PATH_STORAGE)/src
 
 .PHONY: download-code
 download-code: _check_setup  ### Download code directory from the platform storage
@@ -206,11 +205,11 @@ download-code: _check_setup  ### Download code directory from the platform stora
 		--recursive \
 		--update \
 		--no-target-directory \
-		$(PROJECT_PATH_STORAGE)/$(CODE_DIR) $(CODE_DIR)
+		$(PROJECT_PATH_STORAGE)/src src
 
 .PHONY: clean-code
 clean-code: _check_setup  ### Delete code directory from the platform storage
-	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(CODE_DIR)/*
+	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/src/*
 
 .PHONY: upload-data
 upload-data: _check_setup  ### Upload data directory to the platform storage
@@ -348,7 +347,7 @@ develop: _check_setup $(SYNC)  ### Run a development job
 		--preset $(PRESET) \
 		--detach \
 		--volume $(DATA_DIR_STORAGE):/$(PROJECT_PATH_ENV)/$(DATA_DIR):ro \
-		--volume $(PROJECT_PATH_STORAGE)/$(CODE_DIR):/$(PROJECT_PATH_ENV)/$(CODE_DIR):rw \
+		--volume $(PROJECT_PATH_STORAGE)/src:/$(PROJECT_PATH_ENV)/src:rw \
 		--volume $(PROJECT_PATH_STORAGE)/$(CONFIG_DIR):/$(PROJECT_PATH_ENV)/$(CONFIG_DIR):ro \
 		--volume $(PROJECT_PATH_STORAGE)/$(RESULTS_DIR):/$(PROJECT_PATH_ENV)/$(RESULTS_DIR):rw \
 		--env PYTHONPATH=/$(PROJECT_PATH_ENV) \
@@ -392,9 +391,9 @@ train: _check_setup $(SYNC)   ### Run a training job (set up env var 'RUN' to sp
 		$(OPTION_GCP_CREDENTIALS) $(OPTION_AWS_CREDENTIALS) $(OPTION_WANDB_CREDENTIALS) \
 		$(CUSTOM_ENV) \
 		bash -c 'cd $(PROJECT_PATH_ENV) && \
-		    sh $(CODE_DIR)/download_data.sh && \
-		    python -u $(CODE_DIR)/create_dataset.py \
-		    python -u $(CODE_DIR)/train.py'
+		    sh src/download_data.sh && \
+		    python -u src/create_dataset.py \
+		    python -u src/train.py'
 ifeq ($(TRAIN_STREAM_LOGS), yes)
 	@echo "Streaming logs of the job $(TRAIN_JOB)-$(RUN)"
 	$(NEURO) exec --no-key-check -T $(TRAIN_JOB)-$(RUN) "tail -f /output" || echo -e "Stopped streaming logs.\nUse 'neuro logs <job>' to see full logs."
@@ -422,7 +421,7 @@ hypertrain: _check_setup wandb-check-auth   ### Run jobs in parallel for hyperpa
 	echo "sweep: $$sweep" && [ "$$sweep" ] && echo $$sweep >> $(WANDB_SWEEPS_FILE)
 	@echo "Sweep created and saved to '$(WANDB_SWEEPS_FILE)'"
 	@echo "Updating code and config directories on Neuro Storage..."
-	$(NEURO) cp --recursive --update --no-target-directory $(CODE_DIR) $(PROJECT_PATH_STORAGE)/$(CODE_DIR)
+	$(NEURO) cp --recursive --update --no-target-directory src $(PROJECT_PATH_STORAGE)/src
 	$(NEURO) cp --recursive --update --no-target-directory $(CONFIG_DIR) $(PROJECT_PATH_STORAGE)/$(CONFIG_DIR)
 	@echo "Uploading wandb config file './wandb/settings' to Neuro Storage..."
 	$(NEURO) mkdir -p $(PROJECT_PATH_STORAGE)/wandb
@@ -439,7 +438,7 @@ hypertrain: _check_setup wandb-check-auth   ### Run jobs in parallel for hyperpa
 			--preset $(PRESET) \
 			--detach \
 			--volume $(DATA_DIR_STORAGE):/$(PROJECT_PATH_ENV)/$(DATA_DIR):ro \
-			--volume $(PROJECT_PATH_STORAGE)/$(CODE_DIR):/$(PROJECT_PATH_ENV)/$(CODE_DIR):ro \
+			--volume $(PROJECT_PATH_STORAGE)/src:/$(PROJECT_PATH_ENV)/src:ro \
 			--volume $(PROJECT_PATH_STORAGE)/$(CONFIG_DIR):/$(PROJECT_PATH_ENV)/$(CONFIG_DIR):ro \
 			--volume $(PROJECT_PATH_STORAGE)/sweep-$$sweep:/$(PROJECT_PATH_ENV)/sweep-$$sweep:rw \
 			--volume $(PROJECT_PATH_STORAGE)/wandb:/$(PROJECT_PATH_ENV)/wandb:rw \
@@ -591,7 +590,7 @@ _upgrade:
 		--checkout release \
 		gh:neuromation/cookiecutter-neuro-project \
 		project_slug=$(PROJECT) \
-		code_directory=$(CODE_DIR)
-	git checkout -- $(DATA_DIR) $(CODE_DIR) $(CONFIG_DIR) $(NOTEBOOKS_DIR) $(RESULTS_DIR)
+		code_directory=src
+	git checkout -- $(DATA_DIR) src $(CONFIG_DIR) $(NOTEBOOKS_DIR) $(RESULTS_DIR)
 	git checkout -- .gitignore requirements.txt apt.txt setup.cfg README.md
 	@echo "Some files are successfully changed. Please review the changes using git diff."
