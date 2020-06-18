@@ -553,15 +553,15 @@ setup-local:  ### Install pip requirements locally
 
 .PHONY: format-local
 format-local:  ### Automatically format the code
-	isort -rc modules
-	black modules
+	isort -rc src/*.py
+	black src
 
 .PHONY: lint-local
 lint-local:  ### Run static code analysis locally
-	isort -c -rc modules
-	black --check modules
-	mypy modules
-	flake8 modules
+	isort -c -rc src/*.py
+	black --check src
+	mypy src
+	flake8 src
 
 ##### MISC #####
 
