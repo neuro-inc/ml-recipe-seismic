@@ -70,6 +70,14 @@ TRAIN_STREAM_LOGS?=yes
 #   make train TRAIN_CMD="python ./train.py"
 TRAIN_CMD?=python -u $(CODE_DIR)/train.py --data $(DATA_DIR)
 
+# Command to run jupyter
+JUPYTER_CMD=jupyter $(JUPYTER_MODE) \
+  --no-browser \
+  --ip=0.0.0.0 \
+  --allow-root \
+  --NotebookApp.token= \
+  --notebook-dir=/$(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)
+
 # Postfix of training jobs:
 #   make train RUN=experiment-2
 #   make kill RUN=experiment-2
@@ -178,9 +186,26 @@ setup: ### Setup remote environment
 	$(NEURO) exec --no-key-check -T $(SETUP_JOB) "bash -c 'export DEBIAN_FRONTEND=noninteractive && apt-get -qq update && cat /$(PROJECT_PATH_ENV)/apt.txt | tr -d \"\\r\" | xargs -I % apt-get -qq install --no-install-recommends % && apt-get -qq clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*'"
 	$(NEURO) exec --no-key-check -T $(SETUP_JOB) "bash -c 'pip install --progress-bar=off -U --no-cache-dir -r /$(PROJECT_PATH_ENV)/requirements.txt'"
 	$(NEURO) exec --no-key-check -T $(SETUP_JOB) "bash -c 'ssh-keygen -f /id_rsa -t rsa -N neuromation -q'"
+ifdef __BAKE_SETUP
+	make __bake
+endif
 	$(NEURO) --network-timeout 300 job save $(SETUP_JOB) $(CUSTOM_ENV)
 	$(NEURO) kill $(SETUP_JOB) || :
 	@touch .setup_done
+
+.PHONY: __bake
+__bake: upload-code upload-notebooks upload-results
+	echo "#!/usr/bin/env bash" > /tmp/jupyter.sh
+	echo "$(JUPYTER_CMD) \
+      --NotebookApp.default_url=/notebooks/project-local/notebooks/demo.ipynb \
+      --NotebookApp.shutdown_no_activity_timeout=7200 \
+      --MappingKernelManager.cull_idle_timeout=7200 \
+	" >> /tmp/jupyter.sh
+	$(NEURO) cp /tmp/jupyter.sh $(PROJECT_PATH_STORAGE)/jupyter.sh
+	$(NEURO) exec --no-tty --no-key-check $(SETUP_JOB) \
+	    "bash -c 'mkdir /project-local; cp -R -T $(PROJECT_PATH_ENV) /project-local'"
+	$(NEURO) exec --no-tty --no-key-check $(SETUP_JOB) \
+           "jupyter trust /project-local/notebooks/demo.ipynb"
 
 .PHONY: kill-setup
 kill-setup:  ### Terminate the setup job (if it was not killed by `make setup` itself)
@@ -485,12 +510,7 @@ jupyter: _check_setup $(SYNC) ### Run a job with Jupyter Notebook and open UI in
 		--env DATA_PATH=$(DATA_ROOT_PATH_ENV) \
 		$(OPTION_GCP_CREDENTIALS) $(OPTION_AWS_CREDENTIALS) $(OPTION_WANDB_CREDENTIALS) \
 		$(CUSTOM_ENV) \
-		jupyter $(JUPYTER_MODE) \
-			--no-browser \
-			--ip=0.0.0.0 \
-			--allow-root \
-			--NotebookApp.token= \
-			--notebook-dir=/$(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)
+		$(JUPYTER_CMD)
 
 .PHONY: kill-jupyter
 kill-jupyter:  ### Terminate the job with Jupyter Notebook
