@@ -218,7 +218,7 @@ _check_setup:
 ##### STORAGE #####
 
 .PHONY: upload-code
-upload-code: _check_setup  ### Upload code directory to the platform storage
+upload-code:  ### Upload code directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -226,7 +226,7 @@ upload-code: _check_setup  ### Upload code directory to the platform storage
 		$(CODE_DIR) $(PROJECT_PATH_STORAGE)/$(CODE_DIR)
 
 .PHONY: download-code
-download-code: _check_setup  ### Download code directory from the platform storage
+download-code:  ### Download code directory from the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -234,11 +234,11 @@ download-code: _check_setup  ### Download code directory from the platform stora
 		$(PROJECT_PATH_STORAGE)/$(CODE_DIR) $(CODE_DIR)
 
 .PHONY: clean-code
-clean-code: _check_setup  ### Delete code directory from the platform storage
+clean-code:  ### Delete code directory from the platform storage
 	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(CODE_DIR)/*
 
 .PHONY: upload-data
-upload-data: _check_setup  ### Upload data directory to the platform storage
+upload-data:  ### Upload data directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -246,7 +246,7 @@ upload-data: _check_setup  ### Upload data directory to the platform storage
 		$(DATA_DIR) $(DATA_DIR_STORAGE)
 
 .PHONY: download-data
-download-data: _check_setup  ### Download data directory from the platform storage
+download-data:  ### Download data directory from the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -254,11 +254,11 @@ download-data: _check_setup  ### Download data directory from the platform stora
 		$(DATA_DIR_STORAGE) $(DATA_DIR)
 
 .PHONY: clean-data
-clean-data: _check_setup  ### Delete data directory from the platform storage
+clean-data:  ### Delete data directory from the platform storage
 	$(NEURO) rm --recursive $(DATA_DIR_STORAGE)/*
 
 .PHONY: upload-config
-upload-config: _check_setup  ### Upload config directory to the platform storage
+upload-config:  ### Upload config directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -266,7 +266,7 @@ upload-config: _check_setup  ### Upload config directory to the platform storage
 		$(CONFIG_DIR) $(PROJECT_PATH_STORAGE)/$(CONFIG_DIR)
 
 .PHONY: download-config
-download-config: _check_setup  ### Download config directory from the platform storage
+download-config:  ### Download config directory from the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -278,7 +278,7 @@ clean-config: _check_setup  ### Delete config directory from the platform storag
 	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(CONFIG_DIR)/*
 
 .PHONY: upload-notebooks
-upload-notebooks: _check_setup  ### Upload notebooks directory to the platform storage
+upload-notebooks:  ### Upload notebooks directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -288,7 +288,7 @@ upload-notebooks: _check_setup  ### Upload notebooks directory to the platform s
 		$(NOTEBOOKS_DIR) $(PROJECT_PATH_STORAGE)/$(NOTEBOOKS_DIR)
 
 .PHONY: download-notebooks
-download-notebooks: _check_setup  ### Download notebooks directory from the platform storage
+download-notebooks:  ### Download notebooks directory from the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -298,11 +298,11 @@ download-notebooks: _check_setup  ### Download notebooks directory from the plat
 		$(PROJECT_PATH_STORAGE)/$(NOTEBOOKS_DIR) $(NOTEBOOKS_DIR)
 
 .PHONY: clean-notebooks
-clean-notebooks: _check_setup  ### Delete notebooks directory from the platform storage
+clean-notebooks:  ### Delete notebooks directory from the platform storage
 	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(NOTEBOOKS_DIR)/*
 
 .PHONY: upload-results
-upload-results: _check_setup  ### Upload results directory to the platform storage
+upload-results:  ### Upload results directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -310,7 +310,7 @@ upload-results: _check_setup  ### Upload results directory to the platform stora
 		$(RESULTS_DIR)/ $(PROJECT_PATH_STORAGE)/$(RESULTS_DIR)
 
 .PHONY: download-results
-download-results: _check_setup  ### Download results directory from the platform storage
+download-results:  ### Download results directory from the platform storage
 		$(NEURO) cp \
 		--recursive \
 		--update \
@@ -318,7 +318,7 @@ download-results: _check_setup  ### Download results directory from the platform
 		$(PROJECT_PATH_STORAGE)/$(RESULTS_DIR)/ $(RESULTS_DIR)
 
 .PHONY: clean-results
-clean-results: _check_setup  ### Delete results directory from the platform storage
+clean-results:  ### Delete results directory from the platform storage
 	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(RESULTS_DIR)/*
 
 .PHONY: upload-all
