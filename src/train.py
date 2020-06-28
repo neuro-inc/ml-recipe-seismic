@@ -28,8 +28,6 @@ def get_norm_dict():
         norm_dict = pickle.load(f)
     return norm_dict
 
-norm_dict = get_norm_dict()
-
 
 def get_train_test_split(slices_dir, crossval_dict):
     all_slices = list(slices_dir.glob('*.pkl'))
@@ -86,6 +84,8 @@ def train(c_types: List, model_weights: Path, norm: List, train_slices: List[Pat
 
 
 if __name__ == '__main__':
+
+    norm_dict = get_norm_dict()
 
     # carotage list and initial weights for training; None - training from scratch
     pretrain = {
