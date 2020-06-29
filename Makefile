@@ -78,6 +78,8 @@ JUPYTER_CMD=jupyter $(JUPYTER_MODE) \
   --NotebookApp.token= \
   --notebook-dir=/$(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)
 
+JUPYTER_DETACH=--detach
+
 # Postfix of training jobs:
 #   make train RUN=experiment-2
 #   make kill RUN=experiment-2
@@ -501,7 +503,7 @@ jupyter: _check_setup $(SYNC) ### Run a job with Jupyter Notebook and open UI in
 		--http 8888 \
 		$(HTTP_AUTH) \
 		--browse \
-		--detach \
+		$(JUPYTER_DETACH) \
 		--volume $(DATA_DIR_STORAGE):/$(PROJECT_PATH_ENV)/$(DATA_DIR):rw \
 		--volume $(PROJECT_PATH_STORAGE):/$(PROJECT_PATH_ENV):rw \
 		--life-span=1d \

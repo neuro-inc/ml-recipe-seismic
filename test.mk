@@ -28,6 +28,7 @@ require-notebook-argument:
 
 .PHONY: test_jupyter
 test_jupyter: JUPYTER_CMD=bash -c '$(CMD_PREPARE) && $(CMD_NBCONVERT)'
+test_jupyter: JUPYTER_DETACH=
 test_jupyter: | require-notebook-argument jupyter
 	@echo $(SUCCESS_MSG)
 
