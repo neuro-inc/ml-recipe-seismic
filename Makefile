@@ -208,8 +208,7 @@ __bake: upload-code upload-notebooks upload-results
 	    "bash -c 'mkdir /project-local; cp -R -T $(PROJECT_PATH_ENV) /project-local'"
 	$(NEURO) exec --no-tty --no-key-check $(SETUP_JOB) \
            "jupyter trust /project-local/notebooks/demo.ipynb"
-	export DATA_PATH="/project-local/data"
-	sh /project-local/src/download_data.sh
+	$(NEURO) exec --no-tty --no-key-check $(SETUP_JOB) sh /project-local/src/download_data.sh
 
 .PHONY: kill-setup
 kill-setup:  ### Terminate the setup job (if it was not killed by `make setup` itself)

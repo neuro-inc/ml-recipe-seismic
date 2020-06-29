@@ -49,6 +49,7 @@ jobs:
           command: |
             export CUSTOM_ENV=image:$IMAGE_REF
             make setup __BAKE_SETUP=yes | tee
+            echo "Running jobs with unique tag: $JOBS_TAG"
             export RUN_EXTRA="--tag=$JOBS_TAG"
 
             # NOTE: Notebook fails with "Kernel died" error on cpu-small (2.0G memory)
@@ -60,7 +61,9 @@ jobs:
       - run:
           name: Cleanup Jobs
           command: |
+            echo JOBS_TAG="$JOBS_TAG"
             export JOBS_LEFT=$(neuro -q ps --tag=$JOBS_TAG)
+            echo JOBS_LEFT="$JOBS_LEFT"
             [ ! "$JOBS_LEFT" ] || neuro kill $JOBS_LEFT
           when: always
 
