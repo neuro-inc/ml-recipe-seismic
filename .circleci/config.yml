@@ -38,8 +38,8 @@ jobs:
       - run: &install_dependencies
           name: Install Dependencies, Configure Environment
           command: |
-            pip install --user -r .circleci/requirements.txt
-            pip install --user neuromation==20.6.10  # test against neuro with the old attach-exec
+            pip install --user --no-cache-dir -r .circleci/requirements.txt
+            pip install --user --no-cache-dir neuromation==20.6.10  # test against neuro with the old attach-exec
             neuro config login-with-token $NEURO_TOKEN $NEURO_URL
             neuro config switch-cluster $NEURO_CLUSTER
             neuro config show
@@ -54,8 +54,8 @@ jobs:
             # NOTE: Notebook fails with "Kernel died" error on cpu-small (2.0G memory)
             make -f test.mk test_jupyter PRESET=cpu-large | tee
             make -f test.mk test_jupyter PRESET=gpu-small | tee
-            make -f test.mk test_jupyter_baked PRESET=gpu-small | tee
             make -f test.mk test_jupyter_baked PRESET=cpu-large | tee
+            make -f test.mk test_jupyter_baked PRESET=gpu-small | tee
 
       - run:
           name: Cleanup Jobs
