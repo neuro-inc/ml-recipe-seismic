@@ -26,11 +26,11 @@ slices_dir.mkdir(exist_ok=True, parents=True)
 
 # model paths
 model_log_dir = storage_root / 'train_log'
-model_log_dir.mkdir(exist_ok=True)
+model_log_dir.mkdir(exist_ok=True, parents=True)
 dumps_dir = storage_root / 'dumps'
-dumps_dir.mkdir(exist_ok=True)
+dumps_dir.mkdir(exist_ok=True, parents=True)
 model_dir = storage_root / 'models/smoothed'
-model_dir.mkdir(exist_ok=True)
+model_dir.mkdir(exist_ok=True, parents=True)
 
 model_input_size = (480, 512)
 
