@@ -30,6 +30,6 @@ test_jupyter_baked:
 	$(NEURO) run $(RUN_EXTRA) \
 	  --name $(JOB_NAME) \
 		--preset $(PRESET) \
-		$(CUSTOM_ENV_NAME) \
+		$(CUSTOM_ENV) \
 		bash -c '$(CMD_PREPARE) && $(CMD_NBCONVERT)'
 	@echo $(SUCCESS_MSG)

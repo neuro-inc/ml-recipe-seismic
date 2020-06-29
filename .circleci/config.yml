@@ -47,7 +47,7 @@ jobs:
       - run:
           name: Build and Test Image
           command: |
-            export CUSTOM_ENV_NAME=image:$IMAGE_REF
+            export CUSTOM_ENV=image:$IMAGE_REF
             make setup __BAKE_SETUP=yes | tee
             export RUN_EXTRA="--tag=$JOBS_TAG"
 
