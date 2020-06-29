@@ -54,15 +54,15 @@ jobs:
             make -f test.mk test_jupyter NOTEBOOK=inference.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
             make -f test.mk test_jupyter NOTEBOOK=data_preparation.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
             make -f test.mk test_jupyter NOTEBOOK=data_preparation.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
-            # make -f test.mk test_jupyter NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
-            # make -f test.mk test_jupyter NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
+            make -f test.mk test_jupyter NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
+            make -f test.mk test_jupyter NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
 
             make -f test.mk test_jupyter_baked NOTEBOOK=inference.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
             make -f test.mk test_jupyter_baked NOTEBOOK=inference.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
             make -f test.mk test_jupyter_baked NOTEBOOK=data_preparation.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
             make -f test.mk test_jupyter_baked NOTEBOOK=data_preparation.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
-            # make -f test.mk test_jupyter_baked NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
-            # make -f test.mk test_jupyter_baked NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
+            make -f test.mk test_jupyter_baked NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
+            make -f test.mk test_jupyter_baked NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
 
       - run:
           name: Cleanup Jobs
