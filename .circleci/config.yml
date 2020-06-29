@@ -50,19 +50,10 @@ jobs:
             make setup __BAKE_SETUP=yes | tee
             export RUN_EXTRA="--tag=$JOBS_TAG"
 
-            make -f test.mk test_jupyter NOTEBOOK=inference.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
-            make -f test.mk test_jupyter NOTEBOOK=inference.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
-            make -f test.mk test_jupyter NOTEBOOK=data_preparation.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
-            make -f test.mk test_jupyter NOTEBOOK=data_preparation.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
-            make -f test.mk test_jupyter NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
-            make -f test.mk test_jupyter NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
-
-            make -f test.mk test_jupyter_baked NOTEBOOK=inference.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
-            make -f test.mk test_jupyter_baked NOTEBOOK=inference.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
-            make -f test.mk test_jupyter_baked NOTEBOOK=data_preparation.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
-            make -f test.mk test_jupyter_baked NOTEBOOK=data_preparation.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
-            make -f test.mk test_jupyter_baked NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=cpu-small | tee
-            make -f test.mk test_jupyter_baked NOTEBOOK=demo.ipynb TRAINING_MACHINE_TYPE=gpu-small | tee
+            make -f test.mk test_jupyter PRESET=gpu-small | tee
+            make -f test.mk test_jupyter PRESET=cpu-small | tee
+            make -f test.mk test_jupyter_baked PRESET=gpu-small | tee
+            make -f test.mk test_jupyter_baked PRESET=cpu-small | tee
 
       - run:
           name: Cleanup Jobs

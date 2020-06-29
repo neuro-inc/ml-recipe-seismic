@@ -5,7 +5,6 @@ CMD_PREPARE=\
   apt-get -qq update && \
   apt-get -qq install -y --no-install-recommends pandoc >/dev/null
 
-NOTEBOOK=
 CMD_NBCONVERT=\
   jupyter nbconvert \
   --execute \
@@ -13,33 +12,26 @@ CMD_NBCONVERT=\
   --no-input \
   --to=asciidoc \
   --ExecutePreprocessor.timeout=600 \
-  --output=/tmp/out $(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)/$(NOTEBOOK)
+  --output=/tmp/out $(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)/demo.ipynb
 
 SUCCESS_MSG="[+] Test succeeded: \
   PROJECT_PATH_ENV=$(PROJECT_PATH_ENV) \
-  TRAINING_MACHINE_TYPE=$(TRAINING_MACHINE_TYPE) \
-  NOTEBOOK=$(NOTEBOOK)"
-
-
-.PHONY: require-notebook-argument
-require-notebook-argument:
-	$(if $(NOTEBOOK),,$(error Missing required argument NOTEBOOK))
-
+  PRESET=$(PRESET)
 
 .PHONY: test_jupyter
 test_jupyter: JUPYTER_CMD=bash -c '$(CMD_PREPARE) && $(CMD_NBCONVERT)'
 test_jupyter: JUPYTER_DETACH=
-test_jupyter: | require-notebook-argument jupyter
+test_jupyter: jupyter
 	@echo $(SUCCESS_MSG)
 
 
 .PHONY: test_jupyter_baked
 test_jupyter_baked: PROJECT_PATH_ENV=/project-local
 test_jupyter_baked: JOB_NAME=jupyter-baked-$(PROJECT_POSTFIX)
-test_jupyter_baked: | require-notebook-argument
+test_jupyter_baked:
 	$(NEURO) run $(RUN_EXTRA) \
 	  --name $(JOB_NAME) \
-		--preset $(TRAINING_MACHINE_TYPE) \
+		--preset $(PRESET) \
 		$(CUSTOM_ENV_NAME) \
 		bash -c '$(CMD_PREPARE) && $(CMD_NBCONVERT)'
 	@echo $(SUCCESS_MSG)
