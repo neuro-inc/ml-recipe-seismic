@@ -14,9 +14,7 @@ CMD_NBCONVERT=\
   --ExecutePreprocessor.timeout=600 \
   --output=/tmp/out $(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)/demo.ipynb
 
-SUCCESS_MSG="[+] Test succeeded: \
-  PROJECT_PATH_ENV=$(PROJECT_PATH_ENV) \
-  PRESET=$(PRESET)
+SUCCESS_MSG="[+] Test succeeded: PROJECT_PATH_ENV=$(PROJECT_PATH_ENV) PRESET=$(PRESET)"
 
 .PHONY: test_jupyter
 test_jupyter: JUPYTER_CMD=bash -c '$(CMD_PREPARE) && $(CMD_NBCONVERT)'
