@@ -39,6 +39,7 @@ jobs:
           name: Install Dependencies, Configure Environment
           command: |
             pip install --user -r .circleci/requirements.txt
+            pip install --user neuromation==20.6.10  # test against neuro with the old attach-exec
             neuro config login-with-token $NEURO_TOKEN $NEURO_URL
             neuro config switch-cluster $NEURO_CLUSTER
             neuro config show
