@@ -28,8 +28,6 @@ def get_norm_dict():
         norm_dict = pickle.load(f)
     return norm_dict
 
-norm_dict = get_norm_dict()
-
 
 def get_train_test_split(slices_dir, crossval_dict):
     all_slices = list(slices_dir.glob('*.pkl'))
@@ -53,9 +51,6 @@ csv_logger = CSVLogger(model_log_dir / r'training-sz{}x{}.log'.format(*model_inp
 
 nb_epoch = 50
 batch_size = 1
-
-# Train/test split
-cv_dataset = get_train_test_split(slices_dir, crossval_dict)
 
 
 def train(c_types: List, model_weights: Path, norm: List, train_slices: List[Path],
@@ -86,6 +81,11 @@ def train(c_types: List, model_weights: Path, norm: List, train_slices: List[Pat
 
 
 if __name__ == '__main__':
+
+    norm_dict = get_norm_dict()
+
+    # Train/test split
+    cv_dataset = get_train_test_split(slices_dir, crossval_dict)
 
     # carotage list and initial weights for training; None - training from scratch
     pretrain = {

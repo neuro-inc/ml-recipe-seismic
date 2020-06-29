@@ -6,11 +6,12 @@ warnings.simplefilter(action='ignore')
 
 from keras import backend as K
 from src.model1 import uResNet34
-from src.train import cv_dataset, norm_dict
+from src.train import get_train_test_split, get_norm_dict
 from src.gen1 import SliceIterator, primary_transform
 from src.const import (
     model_dir, model_input_size,
-    wells, ilines, xlines, nsamples, dt
+    wells, ilines, xlines, nsamples, dt,
+    slices_dir, crossval_dict
 )
 import numpy as np
 import cv2
@@ -37,6 +38,7 @@ def predict_on_fold(slice_list: List[Path], carotage: str, model_weights: Path, 
     """predict model for a single fold
     return: dict[slice/well]{'seism', 'mask', 'y_true', 'y_pred', 'corr'}"""
 
+    norm_dict = get_norm_dict()
     norm = [(norm_dict[c]['mean'], norm_dict[c]['std']) for c in ['seismic', carotage]]
 
     K.clear_session()
@@ -74,6 +76,7 @@ def predict_on_fold(slice_list: List[Path], carotage: str, model_weights: Path, 
 def eval_fold(data: dict, carotage: str) -> dict:
     """return: dict[slice/well]: {'t', 'true_carotage', 'pred_carotage', 'corr'}"""
 
+    norm_dict = get_norm_dict()
     mean, std = norm_dict[carotage]['mean'], norm_dict[carotage]['std']
     viz_data = {}
     for i_d, d in data.items():
@@ -94,6 +97,7 @@ def process_all_folds(weights: dict, carotage: str) -> dict:
     """process all folds for a given carotage type
     return: dict[slice/well]: {'t', 'true_carotage', 'pred_carotage', 'corr'}"""
 
+    cv_dataset = get_train_test_split(slices_dir, crossval_dict)
     folds = range(len(cv_dataset))
     all_viz = {}
     for fold in folds:
