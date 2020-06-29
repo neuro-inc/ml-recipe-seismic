@@ -25,7 +25,7 @@ test_jupyter: jupyter
 
 .PHONY: test_jupyter_baked
 test_jupyter_baked: PROJECT_PATH_ENV=/project-local
-test_jupyter_baked: JOB_NAME=jupyter-baked-$(PROJECT_POSTFIX)
+test_jupyter_baked: JOB_NAME=jupyter-baked-$(PROJECT)
 test_jupyter_baked:
 	$(NEURO) run $(RUN_EXTRA) \
 	  --name $(JOB_NAME) \
