@@ -47,10 +47,10 @@ jobs:
       - run:
           name: Build and Test Image
           command: |
+            export RUN_EXTRA="--tag=$JOBS_TAG"
             export CUSTOM_ENV=image:$IMAGE_REF
             make setup __BAKE_SETUP=yes | tee
             echo "Running jobs with unique tag: $JOBS_TAG"
-            export RUN_EXTRA="--tag=$JOBS_TAG"
 
             # NOTE: Notebook fails with "Kernel died" error on cpu-small (2.0G memory)
             make -f test.mk test_jupyter PRESET=cpu-large | tee
