@@ -174,7 +174,7 @@ setup: ### Setup remote environment
 	$(NEURO) run $(RUN_EXTRA) \
 		--name $(SETUP_JOB) \
 		--tag "target:setup" $(_PROJECT_TAGS) \
-		--preset cpu-large \
+		--preset cpu-small \
 		--detach \
 		--life-span=1h \
 		--volume $(PROJECT_PATH_STORAGE):/$(PROJECT_PATH_ENV):ro \
