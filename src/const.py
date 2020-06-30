@@ -13,14 +13,15 @@ import os
 ROOT_PATH = Path(__file__).absolute().parent.parent
 data_root = Path(os.environ.get('DATA_PATH', "/data"))
 
-seg_path = data_root / 'Seismic_data.sgy'
-# las_dir = data_root / 'las/raw'        # raw carotage data
-las_dir = data_root / 'las/smoothed'     # smoothed carotage data
+data_dir = data_root / 'data'
+seg_path = data_dir / 'Seismic_data.sgy'
+# las_dir = data_dir / 'las/raw'        # raw carotage data
+las_dir = data_dir / 'las/smoothed'     # smoothed carotage data
 
 # preprocessed data paths
-log_dir = data_root / 'processed_las/smoothed'
+log_dir = data_dir / 'processed_las/smoothed'
 log_dir.mkdir(exist_ok=True, parents=True)
-slices_dir = data_root / 'slices/smoothed'
+slices_dir = data_dir / 'slices/smoothed'
 slices_dir.mkdir(exist_ok=True, parents=True)
 
 # model paths
@@ -48,7 +49,7 @@ crossval_dict = [
 ]
 
 # data normalisation dictionary
-norm_dict_path = data_root / 'norm_dict_smoothed.pkl'
+norm_dict_path = data_dir / 'norm_dict_smoothed.pkl'
 
 # max distance from a seismic slice to a well to be projected
 max_distance = 180  # meters. Not currently used
@@ -73,7 +74,7 @@ nsamples = raw_cube.shape[-1]                       # number of trace samples
 dt = 4                                              # delta-time, the sample rate, ms
 
 # well head coordinates
-wellheads = pd.read_csv(data_root / 'wellheads.csv', index_col='WellName')
+wellheads = pd.read_csv(data_dir / 'wellheads.csv', index_col='WellName')
 
 # iline/crossline coordinates
-slice_coord_path = data_root / 'slice_coord_dict.pkl'
+slice_coord_path = data_dir / 'slice_coord_dict.pkl'
