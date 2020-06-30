@@ -15,7 +15,7 @@ neuro login
 | Local directory | Description | Storage URI | Environment mounting point |
 |:--------------- |:----------- |:----------- |:-------------------------- | 
 | `data/` | Data | `storage:ml-recipe-seismic/data/` | `/ml-recipe-seismic/data/` | 
-| `modules/` | Python modules | `storage:ml-recipe-seismic/modules/` | `/ml-recipe-seismic/modules/` |
+| `src/` | Python modules | `storage:ml-recipe-seismic/src/` | `/ml-recipe-seismic/src/` |
 | `config/` | Configuration files | `storage:ml-recipe-seismic/config/` | `/ml-recipe-seismic/config/` |
 | `notebooks/` | Jupyter notebooks | `storage:ml-recipe-seismic/notebooks/` | `/ml-recipe-seismic/notebooks/` |
 | `results/` | Logs and results | `storage:ml-recipe-seismic/results/` | `/ml-recipe-seismic/results/` |
