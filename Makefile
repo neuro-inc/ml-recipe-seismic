@@ -12,7 +12,6 @@ RESULTS_DIR=results
 
 PROJECT_PATH_STORAGE=storage:ml-recipe-seismic
 PROJECT_PATH_ENV=/ml-recipe-seismic
-DATA_ROOT_PATH_ENV=/storage_path
 
 PROJECT=ml-recipe-seismic
 SETUP_JOB=setup-$(PROJECT)
@@ -66,9 +65,15 @@ HTTP_AUTH?=--http-auth
 #   make train TRAIN_STREAM_LOGS=nope
 TRAIN_STREAM_LOGS?=yes
 
-# Command to run training inside the environment:
-#   make train TRAIN_CMD="python ./train.py"
-TRAIN_CMD?=python -u $(CODE_DIR)/train.py --data $(DATA_DIR)
+# Command to run jupyter
+JUPYTER_CMD=jupyter $(JUPYTER_MODE) \
+  --no-browser \
+  --ip=0.0.0.0 \
+  --allow-root \
+  --NotebookApp.token= \
+  --notebook-dir=/$(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)
+
+JUPYTER_DETACH=--detach
 
 # Postfix of training jobs:
 #   make train RUN=experiment-2
@@ -106,7 +111,7 @@ WANDB_SWEEP_CONFIG_FILE?=wandb-sweep.yaml
 
 # Storage synchronization:
 #  make jupyter SYNC=""
-SYNC?=upload-code upload-config upload-notebooks
+SYNC?=upload-code upload-config
 
 ##### CONSTANTS #####
 
@@ -178,9 +183,26 @@ setup: ### Setup remote environment
 	$(NEURO) exec --no-key-check -T $(SETUP_JOB) "bash -c 'export DEBIAN_FRONTEND=noninteractive && apt-get -qq update && cat /$(PROJECT_PATH_ENV)/apt.txt | tr -d \"\\r\" | xargs -I % apt-get -qq install --no-install-recommends % && apt-get -qq clean && apt-get autoremove && rm -rf /var/lib/apt/lists/*'"
 	$(NEURO) exec --no-key-check -T $(SETUP_JOB) "bash -c 'pip install --progress-bar=off -U --no-cache-dir -r /$(PROJECT_PATH_ENV)/requirements.txt'"
 	$(NEURO) exec --no-key-check -T $(SETUP_JOB) "bash -c 'ssh-keygen -f /id_rsa -t rsa -N neuromation -q'"
+ifdef __BAKE_SETUP
+	make __bake
+endif
 	$(NEURO) --network-timeout 300 job save $(SETUP_JOB) $(CUSTOM_ENV)
 	$(NEURO) kill $(SETUP_JOB) || :
 	@touch .setup_done
+
+.PHONY: __bake
+__bake: upload-code upload-notebooks upload-results
+	echo "#!/usr/bin/env bash" > /tmp/jupyter.sh
+	echo "$(JUPYTER_CMD) \
+      --NotebookApp.default_url=/notebooks/project-local/notebooks/demo.ipynb \
+      --NotebookApp.shutdown_no_activity_timeout=7200 \
+      --MappingKernelManager.cull_idle_timeout=7200 \
+	" >> /tmp/jupyter.sh
+	$(NEURO) cp /tmp/jupyter.sh $(PROJECT_PATH_STORAGE)/jupyter.sh
+	$(NEURO) exec --no-tty --no-key-check $(SETUP_JOB) \
+	    "bash -c 'mkdir /project-local; cp -R -T $(PROJECT_PATH_ENV) /project-local'"
+	$(NEURO) exec --no-tty --no-key-check $(SETUP_JOB) \
+           "jupyter trust /project-local/notebooks/demo.ipynb"
 
 .PHONY: kill-setup
 kill-setup:  ### Terminate the setup job (if it was not killed by `make setup` itself)
@@ -193,7 +215,7 @@ _check_setup:
 ##### STORAGE #####
 
 .PHONY: upload-code
-upload-code: _check_setup  ### Upload code directory to the platform storage
+upload-code:  ### Upload code directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -201,7 +223,7 @@ upload-code: _check_setup  ### Upload code directory to the platform storage
 		$(CODE_DIR) $(PROJECT_PATH_STORAGE)/$(CODE_DIR)
 
 .PHONY: download-code
-download-code: _check_setup  ### Download code directory from the platform storage
+download-code:  ### Download code directory from the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -209,11 +231,11 @@ download-code: _check_setup  ### Download code directory from the platform stora
 		$(PROJECT_PATH_STORAGE)/$(CODE_DIR) $(CODE_DIR)
 
 .PHONY: clean-code
-clean-code: _check_setup  ### Delete code directory from the platform storage
+clean-code:  ### Delete code directory from the platform storage
 	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(CODE_DIR)/*
 
 .PHONY: upload-data
-upload-data: _check_setup  ### Upload data directory to the platform storage
+upload-data:  ### Upload data directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -221,7 +243,7 @@ upload-data: _check_setup  ### Upload data directory to the platform storage
 		$(DATA_DIR) $(DATA_DIR_STORAGE)
 
 .PHONY: download-data
-download-data: _check_setup  ### Download data directory from the platform storage
+download-data:  ### Download data directory from the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -229,11 +251,11 @@ download-data: _check_setup  ### Download data directory from the platform stora
 		$(DATA_DIR_STORAGE) $(DATA_DIR)
 
 .PHONY: clean-data
-clean-data: _check_setup  ### Delete data directory from the platform storage
+clean-data:  ### Delete data directory from the platform storage
 	$(NEURO) rm --recursive $(DATA_DIR_STORAGE)/*
 
 .PHONY: upload-config
-upload-config: _check_setup  ### Upload config directory to the platform storage
+upload-config:  ### Upload config directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -241,7 +263,7 @@ upload-config: _check_setup  ### Upload config directory to the platform storage
 		$(CONFIG_DIR) $(PROJECT_PATH_STORAGE)/$(CONFIG_DIR)
 
 .PHONY: download-config
-download-config: _check_setup  ### Download config directory from the platform storage
+download-config:  ### Download config directory from the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -253,7 +275,7 @@ clean-config: _check_setup  ### Delete config directory from the platform storag
 	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(CONFIG_DIR)/*
 
 .PHONY: upload-notebooks
-upload-notebooks: _check_setup  ### Upload notebooks directory to the platform storage
+upload-notebooks:  ### Upload notebooks directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -263,7 +285,7 @@ upload-notebooks: _check_setup  ### Upload notebooks directory to the platform s
 		$(NOTEBOOKS_DIR) $(PROJECT_PATH_STORAGE)/$(NOTEBOOKS_DIR)
 
 .PHONY: download-notebooks
-download-notebooks: _check_setup  ### Download notebooks directory from the platform storage
+download-notebooks:  ### Download notebooks directory from the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -273,11 +295,11 @@ download-notebooks: _check_setup  ### Download notebooks directory from the plat
 		$(PROJECT_PATH_STORAGE)/$(NOTEBOOKS_DIR) $(NOTEBOOKS_DIR)
 
 .PHONY: clean-notebooks
-clean-notebooks: _check_setup  ### Delete notebooks directory from the platform storage
+clean-notebooks:  ### Delete notebooks directory from the platform storage
 	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(NOTEBOOKS_DIR)/*
 
 .PHONY: upload-results
-upload-results: _check_setup  ### Upload results directory to the platform storage
+upload-results:  ### Upload results directory to the platform storage
 	$(NEURO) cp \
 		--recursive \
 		--update \
@@ -285,7 +307,7 @@ upload-results: _check_setup  ### Upload results directory to the platform stora
 		$(RESULTS_DIR)/ $(PROJECT_PATH_STORAGE)/$(RESULTS_DIR)
 
 .PHONY: download-results
-download-results: _check_setup  ### Download results directory from the platform storage
+download-results:  ### Download results directory from the platform storage
 		$(NEURO) cp \
 		--recursive \
 		--update \
@@ -293,7 +315,7 @@ download-results: _check_setup  ### Download results directory from the platform
 		$(PROJECT_PATH_STORAGE)/$(RESULTS_DIR)/ $(RESULTS_DIR)
 
 .PHONY: clean-results
-clean-results: _check_setup  ### Delete results directory from the platform storage
+clean-results:  ### Delete results directory from the platform storage
 	$(NEURO) rm --recursive $(PROJECT_PATH_STORAGE)/$(RESULTS_DIR)/*
 
 .PHONY: upload-all
@@ -386,7 +408,6 @@ train: _check_setup $(SYNC)   ### Run a training job (set up env var 'RUN' to sp
 		--volume $(DATA_DIR_STORAGE):/$(PROJECT_PATH_ENV)/$(DATA_DIR):rw \
 		--volume $(PROJECT_PATH_STORAGE):/$(PROJECT_PATH_ENV):rw \
 		--env PYTHONPATH=/$(PROJECT_PATH_ENV) \
-		--env DATA_PATH=$(DATA_ROOT_PATH_ENV) \
 		--env EXPOSE_SSH=yes \
 		--life-span=0 \
 		$(OPTION_GCP_CREDENTIALS) $(OPTION_AWS_CREDENTIALS) $(OPTION_WANDB_CREDENTIALS) \
@@ -476,20 +497,14 @@ jupyter: _check_setup $(SYNC) ### Run a job with Jupyter Notebook and open UI in
 		--http 8888 \
 		$(HTTP_AUTH) \
 		--browse \
-		--detach \
+		$(JUPYTER_DETACH) \
 		--volume $(DATA_DIR_STORAGE):/$(PROJECT_PATH_ENV)/$(DATA_DIR):rw \
 		--volume $(PROJECT_PATH_STORAGE):/$(PROJECT_PATH_ENV):rw \
 		--life-span=1d \
 		--env PYTHONPATH=/$(PROJECT_PATH_ENV) \
-		--env DATA_PATH=$(DATA_ROOT_PATH_ENV) \
 		$(OPTION_GCP_CREDENTIALS) $(OPTION_AWS_CREDENTIALS) $(OPTION_WANDB_CREDENTIALS) \
 		$(CUSTOM_ENV) \
-		jupyter $(JUPYTER_MODE) \
-			--no-browser \
-			--ip=0.0.0.0 \
-			--allow-root \
-			--NotebookApp.token= \
-			--notebook-dir=/$(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)
+		$(JUPYTER_CMD)
 
 .PHONY: kill-jupyter
 kill-jupyter:  ### Terminate the job with Jupyter Notebook
