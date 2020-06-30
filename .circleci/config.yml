@@ -52,10 +52,9 @@ jobs:
             echo "Running jobs with unique tag: $JOBS_TAG"
             export RUN_EXTRA="--tag=$JOBS_TAG"
 
-            # NOTE: Notebook fails with "Kernel died" error on cpu-small (2.0G memory)
-            # make -f test.mk test_jupyter PRESET=cpu-large | tee
-            # make -f test.mk test_jupyter PRESET=gpu-small | tee
-            make -f test.mk test_jupyter_baked PRESET=cpu-large | tee
+            make -f test.mk test_jupyter PRESET=cpu-small | tee
+            make -f test.mk test_jupyter PRESET=gpu-small | tee
+            make -f test.mk test_jupyter_baked PRESET=cpu-small | tee
             make -f test.mk test_jupyter_baked PRESET=gpu-small | tee
 
       - run:
