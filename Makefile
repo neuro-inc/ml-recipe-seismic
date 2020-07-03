@@ -66,12 +66,13 @@ HTTP_AUTH?=--http-auth
 TRAIN_STREAM_LOGS?=yes
 
 # Command to run jupyter
-JUPYTER_CMD=jupyter $(JUPYTER_MODE) \
+JUPYTER_CMD_PRE=jupyter $(JUPYTER_MODE) \
   --no-browser \
   --ip=0.0.0.0 \
   --allow-root \
-  --NotebookApp.token= \
-  --notebook-dir=/$(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)
+  --NotebookApp.token=
+JUPYTER_CMD=$(JUPYTER_CMD_PRE) --notebook-dir=/$(PROJECT_PATH_ENV)/$(NOTEBOOKS_DIR)
+
 
 JUPYTER_DETACH=--detach
 
@@ -193,7 +194,7 @@ endif
 .PHONY: __bake
 __bake: upload-code upload-notebooks upload-results
 	echo "#!/usr/bin/env bash" > /tmp/jupyter.sh
-	echo "$(JUPYTER_CMD) \
+	echo "$(JUPYTER_CMD_PRE) \
       --NotebookApp.default_url=/notebooks/project-local/notebooks/demo.ipynb \
       --NotebookApp.shutdown_no_activity_timeout=7200 \
       --MappingKernelManager.cull_idle_timeout=7200 \
